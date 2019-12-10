@@ -1,5 +1,8 @@
 package com.github.vmas.startplaybackbutton
 
+import android.app.Notification
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -17,6 +20,9 @@ import android.view.View.OnTouchListener
 import android.widget.ImageView
 import kotlin.math.abs
 
+private const val NOTIFICATION_ID = 89468946
+
+private const val STOP_SERVICE_REQUEST_CODE = 7264
 
 class FloatingViewService : Service() {
 
@@ -27,6 +33,31 @@ class FloatingViewService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.ensureNotificationChannelExists()
+
+        val notification = Notification.Builder(this).apply {
+            if (Build.VERSION.SDK_INT >= 26) {
+                setChannelId(FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
+            }
+            setContentTitle("Playback Start Button is showing")
+            setContentText("Click this notification to hide button")
+            setOngoing(true)
+            setContentIntent(
+                PendingIntent.getBroadcast(
+                    this@FloatingViewService,
+                    STOP_SERVICE_REQUEST_CODE,
+                    Intent(this@FloatingViewService, StopServiceReceiver::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            )
+            setSmallIcon(R.mipmap.ic_launcher)
+        }
+            .build()
+
+        startForeground(NOTIFICATION_ID, notification)
 
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
