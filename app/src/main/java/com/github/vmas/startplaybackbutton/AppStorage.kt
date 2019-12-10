@@ -12,4 +12,6 @@ class AppStorage(context: Context) {
     var buttonSize: Int by sharedPrefs.intProperty(def = 48)
     var buttonPosX: Int by sharedPrefs.intProperty()
     var buttonPosY: Int by sharedPrefs.intProperty()
+
+    var targetMediaPlayerPackage: String? by sharedPrefs.stringProperty()
 }

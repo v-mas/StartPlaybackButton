@@ -91,21 +91,42 @@ class FloatingViewService : Service() {
             imageTintList = ColorStateList.valueOf(Color.BLUE)
             elevation = 8f.dp(context)
             setOnClickListener {
-                //context.startActivity(Intent(context, MainActivity::class.java).apply {
-                //    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                //})
-                audioManager.dispatchMediaKeyEvent(
-                    KeyEvent(
-                        KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+                val target = storage.targetMediaPlayerPackage
+                if (target == null) {
+                    audioManager.dispatchMediaKeyEvent(
+                        KeyEvent(
+                            KeyEvent.ACTION_DOWN,
+                            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+                        )
                     )
-                )
-                audioManager.dispatchMediaKeyEvent(
-                    KeyEvent(
-                        KeyEvent.ACTION_UP,
-                        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+                    audioManager.dispatchMediaKeyEvent(
+                        KeyEvent(
+                            KeyEvent.ACTION_UP,
+                            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+                        )
                     )
-                )
+                } else {
+                    context.sendBroadcast(
+                        Intent("android.intent.action.MEDIA_BUTTON").apply {
+                            setPackage(target)
+//                        setClassName("com.google.android.music", "com.google.android.music.playback.MediaButtonIntentReceiver")
+                            putExtra(
+                                "android.intent.extra.KEY_EVENT",
+                                KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+                            )
+                        }
+                    )
+                    context.sendBroadcast(
+                        Intent("android.intent.action.MEDIA_BUTTON").apply {
+                            setPackage(target)
+//                        setClassName("com.google.android.music", "com.google.android.music.playback.MediaButtonIntentReceiver")
+                            putExtra(
+                                "android.intent.extra.KEY_EVENT",
+                                KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+                            )
+                        }
+                    )
+                }
             }
             setOnTouchListener(object : OnTouchListener {
                 private val minMoveDistance =
@@ -151,7 +172,6 @@ class FloatingViewService : Service() {
         }
 
         windowManager.addView(fab, params)
-
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

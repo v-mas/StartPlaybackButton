@@ -24,3 +24,6 @@ fun SharedPreferences.booleanProperty(key: String? = null, def: Boolean = false)
 
 fun SharedPreferences.intProperty(key: String? = null, def: Int = 0) =
     property(key, def, SharedPreferences::getInt, SharedPreferences.Editor::putInt)
+
+fun SharedPreferences.stringProperty(key: String? = null, def: String? = null) =
+    property(key, def, SharedPreferences::getString, SharedPreferences.Editor::putString)

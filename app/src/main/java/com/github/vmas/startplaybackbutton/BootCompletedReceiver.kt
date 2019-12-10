@@ -12,7 +12,7 @@ class BootCompletedReceiver : BroadcastReceiver() {
         if (!AppStorage(context).startAtBoot) return
 
         val serviceIntent = Intent(context, FloatingViewService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= 26) {
             context.startForegroundService(serviceIntent)
         } else {
             context.startService(serviceIntent)
