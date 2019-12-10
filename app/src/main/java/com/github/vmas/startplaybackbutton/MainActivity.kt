@@ -7,7 +7,11 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.ScrollView
+import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.PrintWriter
+import java.io.StringWriter
 
 private const val REQUEST_CODE_OVERLAY_PERMISION = 287348
 
@@ -43,6 +47,17 @@ class MainActivity : Activity() {
         option_boot_start.setOnCheckedChangeListener { _, isChecked ->
             storage.startAtBoot = isChecked
         }
+
+        val handler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, error ->
+            startActivity(
+                Intent(this, DisplayErrorActivity::class.java).putExtra(
+                    EXTRA_EXCEPTION,
+                    error
+                )
+            )
+            handler.uncaughtException(thread, error)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -76,4 +91,22 @@ class MainActivity : Activity() {
         }
     }
 
+}
+
+const val EXTRA_EXCEPTION = "exception"
+
+class DisplayErrorActivity : Activity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        (intent.extras?.getSerializable(EXTRA_EXCEPTION) as? Throwable)?.also { error ->
+            setContentView(ScrollView(this).apply {
+                addView(TextView(context).apply {
+                    val writer = StringWriter()
+                    error.printStackTrace(PrintWriter(writer))
+                    setText(error.message + "\n" + writer.toString())
+                })
+            })
+        } ?: finish()
+    }
 }
