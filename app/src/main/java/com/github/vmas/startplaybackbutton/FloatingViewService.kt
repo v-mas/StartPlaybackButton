@@ -53,6 +53,7 @@ class FloatingViewService : Service() {
                     PendingIntent.FLAG_UPDATE_CURRENT
                 )
             )
+            setPriority(Notification.PRIORITY_MIN)
             setSmallIcon(R.mipmap.ic_launcher)
         }
             .build()
@@ -68,7 +69,7 @@ class FloatingViewService : Service() {
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             } else {
                 @Suppress("DEPRECATION")
-                WindowManager.LayoutParams.TYPE_TOAST
+                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
             },
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
